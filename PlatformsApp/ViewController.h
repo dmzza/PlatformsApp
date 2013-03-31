@@ -9,5 +9,10 @@
 #import <UIKit/UIKit.h>
 
 @interface ViewController : UIViewController
+@property (strong, nonatomic) IBOutlet UIScrollView *scrollView;
+@property (strong, nonatomic) IBOutlet UIButton *eighthAv;
+@property (strong, nonatomic) IBOutlet UIButton *sixthAv;
+@property (strong, nonatomic) IBOutlet UIButton *unionSq;
+@property (strong, nonatomic) IBOutlet UIButton *thirdAv;
 
 @end
