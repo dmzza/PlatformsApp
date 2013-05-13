@@ -7,6 +7,7 @@
 //
 
 #import <UIKit/UIKit.h>
+#import <CoreMotion/CoreMotion.h>
 
 @interface ViewController : UIViewController
 @property (strong, nonatomic) IBOutlet UIScrollView *scrollView;
@@ -14,5 +15,14 @@
 @property (strong, nonatomic) IBOutlet UIButton *sixthAv;
 @property (strong, nonatomic) IBOutlet UIButton *unionSq;
 @property (strong, nonatomic) IBOutlet UIButton *thirdAv;
+@property (strong, nonatomic) UIProgressView *gravity;
+@property (strong, nonatomic) CMMotionManager *motionManager;
 
+@property (strong, nonatomic) NSDate *startFall;
+
+@property double accelSum;
+@property double accelMax;
+@property double fallMax;
+@property double startRate;
+@property int accelCount;
 @end

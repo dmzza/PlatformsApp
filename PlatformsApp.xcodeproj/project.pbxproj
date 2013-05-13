@@ -23,6 +23,7 @@
 		6336F17F1708769000E67CA9 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6336F15A1708768F00E67CA9 /* Foundation.framework */; };
 		6336F1871708769000E67CA9 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 6336F1851708769000E67CA9 /* InfoPlist.strings */; };
 		6336F18A1708769000E67CA9 /* PlatformsAppTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 6336F1891708769000E67CA9 /* PlatformsAppTests.m */; };
+		638276841739F1B100A2134A /* CoreMotion.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 638276831739F1B100A2134A /* CoreMotion.framework */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -58,6 +59,7 @@
 		6336F1861708769000E67CA9 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/InfoPlist.strings; sourceTree = "<group>"; };
 		6336F1881708769000E67CA9 /* PlatformsAppTests.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = PlatformsAppTests.h; sourceTree = "<group>"; };
 		6336F1891708769000E67CA9 /* PlatformsAppTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = PlatformsAppTests.m; sourceTree = "<group>"; };
+		638276831739F1B100A2134A /* CoreMotion.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreMotion.framework; path = System/Library/Frameworks/CoreMotion.framework; sourceTree = SDKROOT; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -65,6 +67,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				638276841739F1B100A2134A /* CoreMotion.framework in Frameworks */,
 				6336F1591708768F00E67CA9 /* UIKit.framework in Frameworks */,
 				6336F15B1708768F00E67CA9 /* Foundation.framework in Frameworks */,
 				6336F15D1708768F00E67CA9 /* CoreGraphics.framework in Frameworks */,
@@ -87,6 +90,7 @@
 		6336F14C1708768F00E67CA9 = {
 			isa = PBXGroup;
 			children = (
+				638276831739F1B100A2134A /* CoreMotion.framework */,
 				6336F15E1708768F00E67CA9 /* PlatformsApp */,
 				6336F1821708769000E67CA9 /* PlatformsAppTests */,
 				6336F1571708768F00E67CA9 /* Frameworks */,
@@ -453,6 +457,7 @@
 				6336F18F1708769000E67CA9 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 		6336F1901708769000E67CA9 /* Build configuration list for PBXNativeTarget "PlatformsAppTests" */ = {
 			isa = XCConfigurationList;
@@ -461,6 +466,7 @@
 				6336F1921708769000E67CA9 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
 	};
