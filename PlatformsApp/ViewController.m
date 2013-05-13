@@ -40,24 +40,16 @@
     
     [self.motionManager startDeviceMotionUpdates];
     
-    NSTimer *timer = [NSTimer scheduledTimerWithTimeInterval:.01 target:self selector:@selector(updateGravity) userInfo:nil repeats:YES];
-    NSTimer *timer2 = [NSTimer scheduledTimerWithTimeInterval:2 target:self selector:@selector(resetAccel) userInfo:nil repeats:YES];
+    NSTimer *timer, *timer2;
+    timer = [NSTimer scheduledTimerWithTimeInterval:.01 target:self selector:@selector(updateGravity) userInfo:nil repeats:YES];
+    timer2 = [NSTimer scheduledTimerWithTimeInterval:0.5 target:self selector:@selector(resetAccel) userInfo:nil repeats:YES];
     self.accelCount = 0;
     self.accelMax = 0;
     self.startFall = nil;
     self.startRate = 0;
     self.fallMax = 0;
-    
-    
-    
-    //if (!motionManager.isDeviceMotionAvailable) {
-        //motionManager.deviceMotionUpdateInterval = 1.0/60.0;
-//        [motionManager startDeviceMotionUpdatesUsingReferenceFrame:CMAttitudeReferenceFrameXArbitraryZVertical toQueue:[NSOperationQueue mainQueue] withHandler:^(CMDeviceMotion *motion, NSError *error) {
-//            NSLog([NSString stringWithFormat:@"%f", motion.gravity.z]);
-//            //[self.gravity setProgress:(motion.gravity.z)];
-//            [self.eighthAv setTitle:[NSString stringWithFormat:@"%f", motion.gravity.z] forState:UIControlStateNormal];
-//        }];
-    //}
+    self.lastTotal = 0;
+    self.stoppedTime = 0;
     
     
     
@@ -93,46 +85,73 @@
 
 - (void)updateGravity
 {
-    self.accelSum += (self.motionManager.deviceMotion.userAcceleration.x + self.motionManager.deviceMotion.userAcceleration.y)/4;
-    CMAcceleration userAccel = self.motionManager.deviceMotion.userAcceleration;
-//    if(self.accelMax < userAccel.x){
-//        self.accelMax = userAccel.x;
+    CMAcceleration vector = self.motionManager.deviceMotion.userAcceleration;
+    
+    //self.accelSum += (vector.x + vector.y)/4;
+    
+    double currentTotal = vector.x + vector.y + vector.z;
+    double currentDiff = fabs(self.lastTotal - currentTotal);
+    //self.lastTotal = currentTotal;
+    
+    self.accelSum += currentTotal;
+    
+//    if(self.accelMax < x){
+//        self.accelMax = vector.x;
 //        [self.unionSq setTitle:@"X" forState:UIControlStateNormal];
 //    }
-//    if(self.accelMax < userAccel.y){
-//        self.accelMax = userAccel.y;
+//    if(self.accelMax < vector.y){
+//        self.accelMax = vector.y;
 //        [self.unionSq setTitle:@"Y" forState:UIControlStateNormal];
 //    }
-//    if(self.accelMax < userAccel.z){
-//        self.accelMax = userAccel.z;
+//    if(self.accelMax < vector.z){
+//        self.accelMax = vector.z;
 //        //[self.unionSq setTitle:@"Z" forState:UIControlStateNormal];
 //    }
     
-    if(userAccel.z > 0.5 && self.startFall == nil) {
+    if(vector.z > 0.5 && self.startFall == nil) {
         self.startFall = [NSDate date];
-        self.startRate = userAccel.z;
-    } else if(self.startFall != nil && userAccel.z < 0.5) {
+        self.startRate = vector.z;
+    } else if(self.startFall != nil && vector.z < 0.5) {
             double fallTime = self.startFall.timeIntervalSinceNow;
             if (self.fallMax > fallTime) {
                 self.fallMax = fallTime;
-                [self.unionSq setTitle:[NSString stringWithFormat:@"fallMax: %f", self.fallMax] forState:UIControlStateNormal];
+                //[self.unionSq setTitle:[NSString stringWithFormat:@"fallMax: %f", self.fallMax] forState:UIControlStateNormal];
                 self.accelMax = self.startRate;
             }
             self.startRate = 0;
             self.startFall = nil;
     }
-    [self.gravity setProgress:(fabs(self.accelSum))];
-    [self.eighthAv setTitle:[NSString stringWithFormat:@"%f", self.accelMax] forState:UIControlStateNormal];
+    
+    
+    
+    [self.gravity setProgress:(fabs(currentTotal))];
+    [self.eighthAv setTitle:[NSString stringWithFormat:@"%f", currentTotal] forState:UIControlStateNormal];
 }
 
 - (void)resetAccel
 {
     if(self.accelSum > 1.0) {
         self.accelCount++;
-        [self.sixthAv setTitle:[NSString stringWithFormat:@"%d", self.accelCount] forState:UIControlStateNormal];
+        //[self.sixthAv setTitle:[NSString stringWithFormat:@"%d", self.accelCount] forState:UIControlStateNormal];
     }
+    
+    double currentDiff = fabs(self.accelSum - self.lastTotal);
+    
+    if(currentDiff < 0.1) {
+        self.stoppedTime += 0.5;
+        [self.sixthAv setTitle:@"STOPPED" forState:UIControlStateNormal];
+        self.sixthAv.backgroundColor = [UIColor colorWithHue:0.09167 saturation:0.86 brightness:0.78 alpha:1.0];
+    }
+    else {
+        self.stoppedTime = 0;
+        [self.sixthAv setTitle:@"moving" forState:UIControlStateNormal];
+        self.sixthAv.backgroundColor = [UIColor colorWithHue:0.02167 saturation:0.86 brightness:0.78 alpha:1.0];
+    }
+    
+    self.lastTotal = self.accelSum;
     self.accelSum = 0;
     
+    [self.unionSq setTitle:[NSString stringWithFormat:@"stopped: %d", (int)self.stoppedTime] forState:UIControlStateNormal];
 }
 
 

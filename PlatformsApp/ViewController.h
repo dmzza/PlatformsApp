@@ -24,5 +24,7 @@
 @property double accelMax;
 @property double fallMax;
 @property double startRate;
+@property double lastTotal;
+@property double stoppedTime;
 @property int accelCount;
 @end
