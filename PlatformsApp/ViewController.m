@@ -31,7 +31,6 @@
     [self.eighthAv setTitle:@"8" forState:UIControlStateNormal];
     [self.eighthAv setTitleColor:[UIColor whiteColor] forState:UIControlStateNormal];
     
-    
     self.gravity = [[UIProgressView alloc] initWithProgressViewStyle:UIProgressViewStyleDefault];
     [self.gravity setFrame:CGRectMake(10, 10, 300, 20)];
     [self.eighthAv addSubview:self.gravity];
@@ -50,6 +49,9 @@
     self.fallMax = 0;
     self.lastTotal = 0;
     self.stoppedTime = 0;
+    self.movingTime = 0;
+    self.movementThreshold = 0.1;
+    self.errorThreshold = 3.0;
     
     
     
@@ -61,6 +63,16 @@
     [self.sixthAv setTitle:@"6" forState:UIControlStateNormal];
     [self.sixthAv setTitleColor:[UIColor whiteColor] forState:UIControlStateNormal];
     
+    self.lastDiff = [[UIProgressView alloc] initWithProgressViewStyle:UIProgressViewStyleDefault];
+    [self.lastDiff setFrame:CGRectMake(10, 10, 300, 20)];
+    self.movementThresholdSlider = [[UISlider alloc] initWithFrame:CGRectMake(10, 30, 300, 20)];
+    [self.movementThresholdSlider setMinimumValue:0];
+    [self.movementThresholdSlider setMaximumValue:1];
+    [self.movementThresholdSlider setValue:self.movementThreshold];
+    [self.movementThresholdSlider addTarget:self action:@selector(movementThresholdSliderChanged:) forControlEvents:UIControlEventValueChanged];
+    [self.sixthAv addSubview:self.lastDiff];
+    [self.sixthAv addSubview:self.movementThresholdSlider];
+    
     self.unionSq = [UIButton buttonWithType:UIButtonTypeCustom];
     self.unionSq.backgroundColor = [UIColor colorWithHue:0.125 saturation:0.86 brightness:0.78 alpha:1.0];
     self.unionSq.titleLabel.font = [UIFont boldSystemFontOfSize:36.0];
@@ -68,12 +80,25 @@
     [self.unionSq setTitle:@"U" forState:UIControlStateNormal];
     [self.unionSq setTitleColor:[UIColor whiteColor] forState:UIControlStateNormal];
     
+    
+    self.error = [[UIProgressView alloc] initWithProgressViewStyle:UIProgressViewStyleDefault];
+    [self.error setFrame:CGRectMake(10, 10, 300, 20)];
+    self.errorThresholdSlider = [[UISlider alloc] initWithFrame:CGRectMake(10, 30, 300, 20)];
+    
+    [self.errorThresholdSlider setMinimumValue:0];
+    [self.errorThresholdSlider setMaximumValue:10];
+    [self.errorThresholdSlider setValue:self.errorThreshold];
+    [self.errorThresholdSlider addTarget:self action:@selector(errorThresholdSliderChanged:) forControlEvents:UIControlEventValueChanged];
+    [self.unionSq addSubview:self.error];
+    [self.unionSq addSubview:self.errorThresholdSlider];
+    
     self.thirdAv = [UIButton buttonWithType:UIButtonTypeCustom];
     self.thirdAv.backgroundColor = [UIColor colorWithHue:0.1694 saturation:0.86 brightness:0.78 alpha:1.0];
     self.thirdAv.titleLabel.font = [UIFont boldSystemFontOfSize:36.0];
     [self.thirdAv setFrame:CGRectMake(0, 498, 320, 166)];
     [self.thirdAv setTitle:@"3" forState:UIControlStateNormal];
     [self.thirdAv setTitleColor:[UIColor whiteColor] forState:UIControlStateNormal];
+    [self.thirdAv addTarget:self action:@selector(copyStats:) forControlEvents:UIControlEventTouchDown];
     
     
     
@@ -137,13 +162,30 @@
     
     double currentDiff = fabs(self.accelSum - self.lastTotal);
     
-    if(currentDiff < 0.1) {
+    [self.lastDiff setProgress:currentDiff];
+    
+    if(currentDiff < self.movementThreshold) {
         self.stoppedTime += 0.5;
+        if(self.movingTime <= self.errorThreshold)
+            self.stoppedTime += self.movingTime;
+        self.movingTime = 0;
+        [self.error setProgress:0];
         [self.sixthAv setTitle:@"STOPPED" forState:UIControlStateNormal];
         self.sixthAv.backgroundColor = [UIColor colorWithHue:0.09167 saturation:0.86 brightness:0.78 alpha:1.0];
     }
     else {
-        self.stoppedTime = 0;
+        self.movingTime += 0.5;
+        if(self.movingTime > self.errorThreshold) {
+            if (self.stoppedTime > 8.0) {
+                [self.thirdAv setTitle:[NSString stringWithFormat:@"lastStop: %d", (int)self.stoppedTime] forState:UIControlStateNormal];
+                UIPasteboard *pb = [UIPasteboard generalPasteboard];
+                [pb setString:[NSString stringWithFormat:@"%f", self.stoppedTime]];
+            }
+            self.stoppedTime = 0;
+            [self.error setProgress:0];
+        } else {
+            [self.error setProgress:(self.movingTime / 10.0)];
+        }
         [self.sixthAv setTitle:@"moving" forState:UIControlStateNormal];
         self.sixthAv.backgroundColor = [UIColor colorWithHue:0.02167 saturation:0.86 brightness:0.78 alpha:1.0];
     }
@@ -151,7 +193,22 @@
     self.lastTotal = self.accelSum;
     self.accelSum = 0;
     
-    [self.unionSq setTitle:[NSString stringWithFormat:@"stopped: %d", (int)self.stoppedTime] forState:UIControlStateNormal];
+    [self.unionSq setTitle:[NSString stringWithFormat:@"|| %d : %d ->", (int)self.stoppedTime, (int)self.movingTime] forState:UIControlStateNormal];
+}
+
+- (void)movementThresholdSliderChanged:(UISlider *)sender {
+    self.movementThreshold = sender.value;
+    [self.thirdAv setTitle:[NSString stringWithFormat:@"mv: %f", self.movementThreshold] forState:UIControlStateNormal];
+}
+
+- (void)errorThresholdSliderChanged:(UISlider *)sender {
+    self.errorThreshold = sender.value;
+    [self.thirdAv setTitle:[NSString stringWithFormat:@"er: %f", self.errorThreshold] forState:UIControlStateNormal];
+}
+
+- (void)copyStats:(UIButton *) sender {
+    UIPasteboard *pb = [UIPasteboard generalPasteboard];
+    [pb setString:self.thirdAv.titleLabel.text];
 }
 
 

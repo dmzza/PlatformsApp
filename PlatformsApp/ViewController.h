@@ -16,6 +16,10 @@
 @property (strong, nonatomic) IBOutlet UIButton *unionSq;
 @property (strong, nonatomic) IBOutlet UIButton *thirdAv;
 @property (strong, nonatomic) UIProgressView *gravity;
+@property (strong, nonatomic) UIProgressView *lastDiff;
+@property (strong, nonatomic) UIProgressView *error;
+@property (strong, nonatomic) UISlider *errorThresholdSlider;
+@property (strong, nonatomic) UISlider *movementThresholdSlider;
 @property (strong, nonatomic) CMMotionManager *motionManager;
 
 @property (strong, nonatomic) NSDate *startFall;
@@ -26,5 +30,8 @@
 @property double startRate;
 @property double lastTotal;
 @property double stoppedTime;
+@property double movingTime;
+@property double errorThreshold;
+@property double movementThreshold;
 @property int accelCount;
 @end
