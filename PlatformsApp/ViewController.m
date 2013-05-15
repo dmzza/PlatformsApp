@@ -37,10 +37,21 @@
     self.motionManager = [[CMMotionManager alloc] init];
     
     
-    [self.motionManager startDeviceMotionUpdates];
+    //[self.motionManager startDeviceMotionUpdates];
+    self.motionManager.deviceMotionUpdateInterval = 0.01;
+    [self.motionManager startDeviceMotionUpdatesToQueue:[NSOperationQueue mainQueue] withHandler:^(CMDeviceMotion *motion, NSError *error) {
+        CMAcceleration vector = motion.userAcceleration;
+        
+        double currentTotal = vector.x + vector.y + vector.z;
+        self.accelSum += currentTotal;
+        
+        [self.gravity setProgress:(fabs(currentTotal))];
+        [self.eighthAv setTitle:[NSString stringWithFormat:@"%f", currentTotal] forState:UIControlStateNormal];
+    }];
+    
     
     NSTimer *timer, *timer2;
-    timer = [NSTimer scheduledTimerWithTimeInterval:.01 target:self selector:@selector(updateGravity) userInfo:nil repeats:YES];
+    //timer = [NSTimer scheduledTimerWithTimeInterval:.01 target:self selector:@selector(updateGravity) userInfo:nil repeats:YES];
     timer2 = [NSTimer scheduledTimerWithTimeInterval:0.5 target:self selector:@selector(resetAccel) userInfo:nil repeats:YES];
     self.accelCount = 0;
     self.accelMax = 0;
@@ -50,8 +61,8 @@
     self.lastTotal = 0;
     self.stoppedTime = 0;
     self.movingTime = 0;
-    self.movementThreshold = 0.1;
-    self.errorThreshold = 3.0;
+    self.movementThreshold = 0.070;
+    self.errorThreshold = 2.238;
     
     
     
